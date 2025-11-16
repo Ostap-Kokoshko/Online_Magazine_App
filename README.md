@@ -1,1 +1,1 @@
-# Online_Blog_App
+# Online_Magazine_App
