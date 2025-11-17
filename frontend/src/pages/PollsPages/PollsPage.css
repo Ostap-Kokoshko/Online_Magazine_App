@@ -1,0 +1,107 @@
+.polls-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.poll-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.poll-card h3 {
+    margin-top: 0;
+}
+.poll-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.poll-option-label {
+    display: block;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.poll-option-label:hover {
+    background-color: #f9f9f9;
+}
+.poll-option-label input {
+    margin-right: 10px;
+}
+
+.poll-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.poll-result-bar {
+    position: relative;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 30px;
+}
+.poll-result-fill {
+    position: absolute;
+    height: 100%;
+    background-color: #4a90e2;
+    opacity: 0.6;
+    transition: width 0.5s ease;
+}
+.poll-result-text {
+    position: relative;
+    z-index: 1;
+    padding: 5px 10px;
+    line-height: 20px;
+    color: #333;
+    font-weight: 500;
+}
+.poll-total-votes {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #777;
+    text-align: right;
+}
+
+.tests-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 20px;
+}
+.test-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+.test-card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+.test-card-content {
+    padding: 20px;
+}
+.test-card-content h3 {
+    margin-top: 0;
+}
+.test-card-content p {
+    font-size: 0.9rem;
+    color: #555;
+    flex-grow: 1;
+}
+.test-card-content span {
+    font-weight: 600;
+    color: #4a90e2;
+}

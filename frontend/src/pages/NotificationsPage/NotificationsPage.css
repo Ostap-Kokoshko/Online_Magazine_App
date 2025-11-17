@@ -1,0 +1,38 @@
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.notification-item {
+    display: block;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s;
+    border-left: 5px solid #4a90e2;
+}
+.notification-item[style*="background: rgb(230, 247, 255)"] {
+    border-left-color: #0056b3;
+    font-weight: bold;
+}
+.notification-item:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.notification-type {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+}
+.notification-message {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #333;
+}
+.notification-date {
+    font-size: 0.8rem;
+    color: #888;
+}
