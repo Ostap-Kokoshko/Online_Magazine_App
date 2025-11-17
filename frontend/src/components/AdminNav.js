@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const navButtonStyle = {
     padding: '10px 15px',
@@ -17,6 +18,8 @@ const activeButtonStyle = {
 };
 
 function AdminNav() {
+    const { user } = useAuth();
+
     return (
         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
             <NavLink
@@ -46,6 +49,18 @@ function AdminNav() {
             >
                 Керувати Тестами
             </NavLink>
+            {user && user.role === 'admin' && (
+                <NavLink
+                    to="/admin/users"
+                    style={({ isActive }) => ({
+                        ...navButtonStyle,
+                        background: '#d9534f', 
+                        ...(isActive ? activeButtonStyle : null)
+                    })}
+                >
+                    Керувати Користувачами
+                </NavLink>
+            )}
         </div>
     );
 }

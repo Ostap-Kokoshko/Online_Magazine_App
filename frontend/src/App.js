@@ -17,6 +17,9 @@ import PollEditor from './pages/AdminPages/PollEditor';
 import AdminTests from './pages/AdminPages/AdminTests';
 import TestEditor from './pages/AdminPages/TestEditor';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
+import SuperAdminRoute from './components/SuperAdminRoute';
+import AdminUsers from './pages/AdminUsers';
+import UserEditor from './pages/UserEditor';
 
 import Navbar from './components/NavBar/Navbar';
 import AuthenticatedRoute from './components/AuthenticatedRoute';
@@ -78,6 +81,15 @@ function App() {
                     <Route path="/admin/tests" element={<AdminRoute><AdminTests /></AdminRoute>} />
                     <Route path="/admin/tests/new" element={<AdminRoute><TestEditor /></AdminRoute>} />
                     <Route path="/admin/tests/edit/:testId" element={<AdminRoute><TestEditor /></AdminRoute>} />
+
+                    <Route
+                        path="/admin/users"
+                        element={<SuperAdminRoute><AdminUsers /></SuperAdminRoute>}
+                    />
+                    <Route
+                        path="/admin/users/new"
+                        element={<SuperAdminRoute><UserEditor /></SuperAdminRoute>}
+                    />
                 </Routes>
             </div>
         </BrowserRouter>

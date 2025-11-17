@@ -21,19 +21,15 @@ function ArticleEditor() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Завантажуємо категорії
-        // (Нам потрібен цей API, але ми його не робили.
-        // Для тестування поки що впишемо їх вручну.)
-        // TODO: Створити API '/api/categories'
-        setCategories([
+        const mockCategories = [
             { id: 1, name: "Технології" },
             { id: 2, name: "Подорожі" },
             { id: 3, name: "Мода" },
             { id: 4, name: "Спорт" },
             { id: 5, name: "Культура" },
             { id: 6, name: "Гаджети" },
-        ]);
-        setCategoryId(1);
+        ];
+        setCategories(mockCategories);
 
         if (isEditMode) {
             apiClient.get(`/articles/${articleId}`)
@@ -42,10 +38,10 @@ function ArticleEditor() {
                     setTitle(article.title);
                     setContent(article.content);
                     setPremiumContent(article.premium_content || '');
-                    setCategoryId(article.category_id);
-                    setIsExclusive(article.isExclusive);
-                    setIsFeatured(article.is_featured);
-                    setStatus(article.status);
+                    setCategoryId(article.category_id || mockCategories[0].id);
+                    setIsExclusive(article.isExclusive || false);
+                    setIsFeatured(article.is_featured || false);
+                    setStatus(article.status || 'draft');
                     setLoading(false);
                 })
                 .catch(err => console.error("Помилка завантаження статті:", err));

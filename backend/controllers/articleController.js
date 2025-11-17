@@ -1,6 +1,6 @@
 const db = require('../models');
 const { Op } = require('sequelize');
-const { notifyAllUsers, notifyPremiumUsers } = require('../services/notificationService');
+const { notifyAllUsers, notifyPremiumUsers, notifyStaff } = require('../services/notificationService');
 
 exports.getFeaturedArticle = async (req, res) => {
     try {
@@ -78,7 +78,7 @@ exports.getArticle = async (req, res) => {
         const article = await db.Article.findByPk(articleId, {
             include: [
                 { model: db.User, as: 'author', attributes: ['username'] },
-                { model: db.Category, as: 'category', attributes: ['name'] },
+                { model: db.Category, as: 'category', attributes: ['id', 'name'] },
                 { model: db.Media, as: 'media_files', attributes: ['url', 'type', 'alt_text', 'is_exclusive'] }
             ]
         });
@@ -94,9 +94,12 @@ exports.getArticle = async (req, res) => {
             title: article.title,
             content: article.content,
             premium_content: article.premium_content,
+            category_id: article.category ? article.category.id : null,
             category: article.category?.name || 'Без категорії',
             author: article.author?.username || 'Анонім',
             isExclusive: article.is_exclusive,
+            is_featured: article.is_featured,
+            status: article.status,
             media_files: article.media_files || []
         });
     } catch (err) {
@@ -198,6 +201,8 @@ exports.getAllArticlesForAdmin = async (req, res) => {
 
 exports.createArticle = async (req, res) => {
     const userId = req.user.id;
+    const { id: creatorId, username: creatorName } = req.user;
+
     const {
         title, content, premium_content, category_id,
         is_exclusive, is_featured, status
@@ -224,6 +229,8 @@ exports.createArticle = async (req, res) => {
             }
         }
 
+        notifyStaff(newArticle, 'статтю', creatorId, creatorName, 'створив').catch(console.error);
+
         res.status(201).json(newArticle);
     } catch (err) {
         res.status(500).json({ msg: 'Server error', error: err.message });
@@ -231,6 +238,7 @@ exports.createArticle = async (req, res) => {
 };
 
 exports.updateArticle = async (req, res) => {
+    const { id: creatorId, username: creatorName } = req.user;
     const { articleId } = req.params;
     const {
         title, content, premium_content, category_id,
@@ -242,6 +250,8 @@ exports.updateArticle = async (req, res) => {
         if (!article) {
             return res.status(404).json({ msg: 'Статтю не знайдено' });
         }
+
+        const wasDraft = article.status === 'draft';
 
         await article.update({
             title,
@@ -261,6 +271,8 @@ exports.updateArticle = async (req, res) => {
                 notifyAllUsers(article, 'article').catch(console.error);
             }
         }
+
+        notifyStaff(article, 'статтю', creatorId, creatorName, 'оновив').catch(console.error);
 
         res.json(article);
     } catch (err) {

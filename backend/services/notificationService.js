@@ -1,4 +1,5 @@
 const db = require('../models');
+const { Op } = require('sequelize');
 
 const notifyAllUsers = async (entity, type) => {
     try {
@@ -71,7 +72,40 @@ const notifyPremiumUsers = async (article) => {
     }
 };
 
+const notifyStaff = async (entity, type, creatorId, creatorName, actionType = 'створив') => {
+    try {
+        const message = `Колега ${creatorName} ${actionType} ${type}: "${entity.title || entity.question}"`;
+
+        let link_url = "/admin/dashboard";
+        if (type === 'статтю') link_url = `/admin/article/edit/${entity.id}`;
+        if (type === 'опитування') link_url = `/admin/polls/edit/${entity.id}`;
+        if (type === 'тест') link_url = `/admin/tests/edit/${entity.id}`;
+
+        const staff = await db.User.findAll({
+            where: {
+                role: ['admin', 'editor'],
+                id: { [Op.ne]: creatorId }
+            },
+            attributes: ['id']
+        });
+
+        const notificationsData = staff.map(user => ({
+            message,
+            link_url,
+            type: 'admin_action',
+            user_id: user.id
+        }));
+
+        if (notificationsData.length > 0) {
+            await db.Notification.bulkCreate(notificationsData);
+        }
+    } catch (err) {
+        console.error("Помилка сервісу сповіщень (notifyStaff):", err.message);
+    }
+};
+
 module.exports = {
     notifyAllUsers,
-    notifyPremiumUsers
+    notifyPremiumUsers,
+    notifyStaff
 };

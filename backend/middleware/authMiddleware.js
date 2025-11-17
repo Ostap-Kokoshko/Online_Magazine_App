@@ -39,4 +39,13 @@ const editorOnly = (req, res, next) => {
     }
 };
 
-module.exports = { protect, optionalAuth, editorOnly };
+const adminOnly = (req, res, next) => {
+
+    if (req.user.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ msg: 'Доступ заборонено. Потрібні права адміністратора.' });
+    }
+};
+
+module.exports = { protect, optionalAuth, editorOnly, adminOnly };

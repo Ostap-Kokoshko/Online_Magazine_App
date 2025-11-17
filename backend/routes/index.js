@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, editorOnly } = require('../middleware/authMiddleware');
+const { protect, editorOnly, adminOnly } = require('../middleware/authMiddleware');
 
 router.use('/auth', require('./authRoutes'));
 router.use('/', require('./articleRoutes'));
@@ -12,5 +12,6 @@ router.use('/advertisements', require('./adRoutes'));
 router.use('/admin/polls', protect, editorOnly, require('./adminPollRoutes'));
 router.use('/admin/tests', protect, editorOnly, require('./adminTestRoutes'));
 router.use('/notifications', protect, require('./notificationRoutes'));
+router.use('/admin/users', protect, adminOnly, require('./adminUserRoutes'));
 
 module.exports = router;

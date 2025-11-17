@@ -1,5 +1,5 @@
 const db = require('../models');
-const { notifyAllUsers } = require('../services/notificationService');
+const { notifyAllUsers, notifyStaff } = require('../services/notificationService');
 
 exports.getAllPolls = async (req, res) => {
     try {
@@ -26,6 +26,7 @@ exports.getPollById = async (req, res) => {
 };
 
 exports.createPoll = async (req, res) => {
+    const { id: creatorId, username: creatorName } = req.user;
     const { question, options } = req.body;
     const t = await db.sequelize.transaction();
     try {
@@ -43,6 +44,7 @@ exports.createPoll = async (req, res) => {
         await t.commit();
 
         notifyAllUsers(newPoll, 'poll').catch(console.error);
+        notifyStaff(newPoll, 'опитування', creatorId, creatorName, 'створив').catch(console.error);
 
         res.status(201).json(newPoll);
     } catch (err) {
@@ -52,6 +54,7 @@ exports.createPoll = async (req, res) => {
 };
 
 exports.updatePoll = async (req, res) => {
+    const { id: creatorId, username: creatorName } = req.user;
     const { id } = req.params;
     const { question, options } = req.body;
     const t = await db.sequelize.transaction();
@@ -70,6 +73,9 @@ exports.updatePoll = async (req, res) => {
         await db.PollOption.bulkCreate(optionsData, { transaction: t });
 
         await t.commit();
+
+        notifyStaff(poll, 'опитування', creatorId, creatorName, 'оновив').catch(console.error);
+
         res.json({ msg: 'Опитування оновлено' });
     } catch (err) {
         await t.rollback();

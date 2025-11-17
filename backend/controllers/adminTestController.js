@@ -1,5 +1,5 @@
 const db = require('../models');
-const { notifyAllUsers } = require('../services/notificationService');
+const { notifyAllUsers, notifyStaff } = require('../services/notificationService');
 
 exports.getAllTests = async (req, res) => {
     try {
@@ -32,6 +32,7 @@ exports.getTestById = async (req, res) => {
 };
 
 exports.createTest = async (req, res) => {
+    const { id: creatorId, username: creatorName } = req.user;
     const { title, description, image_url, questions, results } = req.body;
     const t = await db.sequelize.transaction();
     try {
@@ -57,6 +58,7 @@ exports.createTest = async (req, res) => {
         await t.commit();
 
         notifyAllUsers(newTest, 'test').catch(console.error);
+        notifyStaff(newTest, 'тест', creatorId, creatorName, 'створив').catch(console.error);
 
         res.status(201).json(newTest);
     } catch (err) {
@@ -66,6 +68,7 @@ exports.createTest = async (req, res) => {
 };
 
 exports.updateTest = async (req, res) => {
+    const { id: creatorId, username: creatorName } = req.user;
     const { id } = req.params;
     const { title, description, image_url, questions, results } = req.body;
     const t = await db.sequelize.transaction();
@@ -75,10 +78,19 @@ exports.updateTest = async (req, res) => {
 
         await test.update({ title, description, image_url }, { transaction: t });
 
-        await db.TestQuestion.destroy({ where: { test_id: id } }, { transaction: t });
-        await db.TestResult.destroy({ where: { test_id: id } }, { transaction: t });
+        await db.TestQuestion.destroy({
+            where: { test_id: id },
+            transaction: t
+        });
+        await db.TestResult.destroy({
+            where: { test_id: id },
+            transaction: t
+        });
 
-        const resultsData = results.map(r => ({ ...r, test_id: test.id }));
+        const resultsData = results.map(({ id, ...r }) => ({
+            ...r,
+            test_id: test.id
+        }));
         await db.TestResult.bulkCreate(resultsData, { transaction: t });
 
         for (const q of questions) {
@@ -87,15 +99,17 @@ exports.updateTest = async (req, res) => {
                 test_id: test.id
             }, { transaction: t });
 
-            const answersData = q.answers.map(a => ({
-                text: a.text,
-                result_key: a.result_key,
+            const answersData = q.answers.map(({ id, ...a }) => ({
+                ...a,
                 question_id: newQuestion.id
             }));
             await db.TestAnswer.bulkCreate(answersData, { transaction: t });
         }
 
         await t.commit();
+
+        notifyStaff(test, 'тест', creatorId, creatorName, 'оновив').catch(console.error);
+
         res.json({ msg: 'Тест оновлено' });
     } catch (err) {
         await t.rollback();
